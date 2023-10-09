@@ -53,11 +53,11 @@ async function setup() {
   brainData = await processData(csvFilePath);
   console.log(brainData)
 
-  currentAf3 = brainData[0]['EEG.AF3'];
-  currentAf4 = brainData[0]['EEG.AF4'];
-  currentPz = brainData[0]['EEG.Pz'];
-  currentT7 = brainData[0]['EEG.T7'];
-  currentT8 = brainData[0]['EEG.T8'];
+  // currentAf3 = brainData[0]['EEG.AF3'];
+  // currentAf4 = brainData[0]['EEG.AF4'];
+  // currentPz = brainData[0]['EEG.Pz'];
+  // currentT7 = brainData[0]['EEG.T7'];
+  // currentT8 = brainData[0]['EEG.T8'];
   
   for (var i = 0; i < agentCount; i++) {
     agents[i] = new Agent(noiseZRange);
@@ -71,38 +71,38 @@ function draw() {
   noStroke();
   rect(0, 0, width, height);
 
-  if (currentIndex < brainData.length) {
-    currentAf3 = brainData[currentIndex]['EEG.AF3'];
-    currentAf4 = brainData[currentIndex]['EEG.AF4'];
-    currentPz = brainData[currentIndex]['EEG.Pz'];
-    currentT7 = brainData[currentIndex]['EEG.T7'];
-    currentT8 = brainData[currentIndex]['EEG.T8'];
+  // if (currentIndex < brainData.length) {
+  //   currentAf3 = brainData[currentIndex]['EEG.AF3'];
+  //   currentAf4 = brainData[currentIndex]['EEG.AF4'];
+  //   currentPz = brainData[currentIndex]['EEG.Pz'];
+  //   currentT7 = brainData[currentIndex]['EEG.T7'];
+  //   currentT8 = brainData[currentIndex]['EEG.T8'];
     
-    currentIndex++;
-  } else {
-    currentIndex = 0;
-  }
+  //   currentIndex++;
+  // } else {
+  //   currentIndex = 0;
+  // }
 
-  step++
-  if (step % 25 === 0) {
-    noiseScale = lerp(noiseScale, (currentAf3-4000)*10, 0.3)
-    strokeWidth = lerp(strokeWidth, (currentT7-4000)/500, 0.3)
-    noiseStrength = lerp(noiseStrength, (currentPz-4000)/30, 0.3)
-  }
+  // step++
+  // if (step % 25 === 0) {
+  //   noiseScale = lerp(noiseScale, (currentAf3-4000)*10, 0.3)
+  //   strokeWidth = lerp(strokeWidth, (currentT7-4000)/500, 0.3)
+  //   noiseStrength = lerp(noiseStrength, (currentPz-4000)/30, 0.3)
+  // }
 
-  let newColor = color(random(0, 100), random(100, 200), random(200, 255));
-  if(noiseStrength > 4){
-    newColor = color(random(0, 100), random(200, 255), random(0, 100));
-  }
-  if(noiseStrength > 6){
-    newColor = color(random(200, 255), random(0, 100), random(0, 100));
-  }
+  // let newColor = color(random(0, 100), random(100, 200), random(200, 255));
+  // if(noiseStrength > 4){
+  //   newColor = color(random(0, 100), random(200, 255), random(0, 100));
+  // }
+  // if(noiseStrength > 6){
+  //   newColor = color(random(200, 255), random(0, 100), random(0, 100));
+  // }
 
   stroke(0, agentAlpha);
   for (var i = 0; i < agentCount; i++) {
-    if(i <= 200){
+    if(i <= 1000){
       agents[i].update(strokeWidth, noiseScale, noiseStrength, noiseZVelocity, color(random(0, 100), random(100, 200), random(200, 255))); 
-    } else if(i <= 400) {
+    } /*else if(i <= 400) {
       agents[i].update(strokeWidth, noiseScale, noiseStrength*10, noiseZVelocity, color(random(0, 100), random(200, 255), random(0, 100))); 
     } else if(i <= 600) {
       agents[i].update(strokeWidth, noiseScale, noiseStrength*5, noiseZVelocity, color(random(200, 255), random(0, 100), random(0, 100))); 
@@ -110,6 +110,6 @@ function draw() {
       agents[i].update(strokeWidth, noiseScale, noiseStrength*10, noiseZVelocity, color(random(0, 100), random(200, 255), random(0, 100))); 
     } else if(i <= 1000){
       agents[i].update(strokeWidth, noiseScale, noiseStrength*10, noiseZVelocity, color(random(0, 100), random(200, 255), random(0, 100))); 
-    }
+    }*/
   }
 }
