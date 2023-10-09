@@ -11,7 +11,6 @@ function processData(csvFilePath) {
               const data = result.data;
     
               const columnsToAccess = ['Timestamp', 'EEG.AF3', 'EEG.T7', 'EEG.Pz', 'EEG.T8', 'EEG.AF4'];
-    
               let firstTimestamp = null;
     
               const valuesFromColumns = data.map((row) => {
