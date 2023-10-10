@@ -13,12 +13,14 @@ class Agent {
     this.noiseZ;
     this.agentColor;
     this.speedFactor = 0.25;
+    this.targetWidth;
 
     if (freqName == "gamma") {
       this.noiseScale = 1000;
       this.noiseStrength = 5;
       this.noiseZ = random(0.1);
-      this.strokeWidth = 8;
+      this.strokeWidth = 3;
+      this.targetWidth = 3;
       this.agentColor = color(colors.gamma)
       this.stepSize = 25 * this.speedFactor;
       this.noiseZVelocity = 0.01;
@@ -27,6 +29,7 @@ class Agent {
       this.noiseStrength = 6;
       this.noiseZ = random(0.4);
       this.strokeWidth = 3;
+      this.targetWidth = 3;
       this.agentColor = color(colors.betaH)
       this.stepSize = 17 * this.speedFactor;
       this.noiseZVelocity = 0.01;
@@ -35,6 +38,7 @@ class Agent {
       this.noiseStrength = 20;
       this.noiseZ = random(0.4);
       this.strokeWidth = 3;
+      this.targetWidth = 3;
       this.agentColor = color(colors.betaL)
       this.stepSize = 10 * this.speedFactor;
       this.noiseZVelocity = 0.02;
@@ -43,6 +47,7 @@ class Agent {
       this.noiseStrength = 35;
       this.noiseZ = random(0.4);
       this.strokeWidth = 3;
+      this.targetWidth = 3;
       this.agentColor = color(colors.alpha)
       this.stepSize = 10 * this.speedFactor;
       this.noiseZVelocity = 0.03;
@@ -51,6 +56,7 @@ class Agent {
       this.noiseStrength = 40;
       this.noiseZ = random(0.4);
       this.strokeWidth = 3;
+      this.targetWidth = 3;
       this.agentColor = color(colors.theta)
       this.stepSize = 3 * this.speedFactor;
       this.noiseZVelocity = 0.04;
@@ -68,20 +74,26 @@ class Agent {
     if (this.vector.y < -10) this.vector.y = this.vectorOld.y = height + 10;
     if (this.vector.y > height + 10) this.vector.y = this.vectorOld.y = -10;
 
-    if (this.freqType === 'gamma') {
-      if (gamma > 10) {
-        gamma = 10
+    if(step % 50 == 0){
+      if (this.freqType === 'gamma') {
+        this.targetWidth = gamma / 5
+      } else if (this.freqType === 'betaH') {
+        this.targetWidth = betaH / 5
+      } else if (this.freqType === 'betaL') {
+        this.targetWidth = betaL / 5
+      } else if (this.freqType === 'alpha') {
+        this.targetWidth = alpha / 5
+      } else if (this.freqType === 'theta') {
+        this.targetWidth = theta / 50
       }
-      this.strokeWidth = lerp(this.strokeWidth, gamma / 5)
-    } else if (this.freqType === 'betaH') {
-      this.strokeWidth = betaH / 5
-    } else if (this.freqType === 'betaL') {
-      this.strokeWidth = betaL / 5
-    } else if (this.freqType === 'alpha') {
-      this.strokeWidth = alpha / 5
-    } else if (this.freqType === 'theta') {
-      this.strokeWidth = theta / 50
     }
+
+    if(this.targetWidth >= this.strokeWidth) {
+      this.strokeWidth = lerp(this.strokeWidth, this.targetWidth, 0.5)
+    } else {
+      this.strokeWidth = lerp(this.targetWidth, this.strokeWidth, 0.5)
+    }
+
     strokeWeight(this.strokeWidth);
     stroke(this.agentColor)
     line(this.vectorOld.x, this.vectorOld.y, this.vector.x, this.vector.y);
@@ -135,8 +147,6 @@ function findHighestAndLowest(numbers) {
     lowest: lowest
   };
 }
-
-
 
 async function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -201,14 +211,11 @@ async function setup() {
       agents.push(new Agent(type));
     }
   }
-
-  // for (var i = 0; i < agentCount; i++) {
-  //   if (i <= agentCount / 5) {
-  //     agents[i] = new Agent("alpha");
 }
 
 let step = 0
 function draw() {
+  step++;
 
   fill(0, overlayAlpha);
   noStroke();
@@ -222,17 +229,8 @@ function draw() {
     theta = brainData[currentIndex].theta;
     currentIndex++;
   } else {
-    console.log('reset')
     currentIndex = 0;
   }
-
-  // step++
-  // if (step % 250 === 0 || currentIndex == 0) {
-  //   noiseScale = lerp(noiseScale, (currentAf3 - 4000) * 10, 0.3)
-  //   strokeWidth = lerp(strokeWidth, (currentT7 - 4000) / 500, 0.3)
-  //   noiseStrength = lerp(noiseStrength, (currentPz - 4000) / 30, 0.3)
-
-  // }
 
   stroke(0, agentAlpha);
   for (var i = 0; i < agentCount; i++) {
