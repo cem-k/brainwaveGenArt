@@ -78,13 +78,13 @@ class Agent {
       if (this.freqType === 'gamma') {
         this.targetWidth =  map(gamma, highestAndLowestGamma.lowest, highestAndLowestGamma.highest, 2, 12, true)
       } else if (this.freqType === 'betaH') {
-        this.targetWidth = map(gamma, highestAndLowestBetaH.lowest, highestAndLowestBetaL.highest, 2, 12, true)
+        this.targetWidth = map(betaH, highestAndLowestBetaH.lowest, highestAndLowestBetaL.highest, 2, 12, true)
       } else if (this.freqType === 'betaL') {
-        this.targetWidth = map(gamma, highestAndLowestBetaL.lowest, highestAndLowestBetaL.highest, 2, 12, true)
+        this.targetWidth = map(betaL, highestAndLowestBetaL.lowest, highestAndLowestBetaL.highest, 2, 12, true)
       } else if (this.freqType === 'alpha') {
-        this.targetWidth = map(gamma, highestAndLowestAlpha.lowest, highestAndLowestAlpha.highest, 2, 12, true)
+        this.targetWidth = map(alpha, highestAndLowestAlpha.lowest, highestAndLowestAlpha.highest, 2, 12, true)
       } else if (this.freqType === 'theta') {
-        this.targetWidth = map(gamma, highestAndLowestTheta.lowest, highestAndLowestTheta.highest, 2, 12, true)
+        this.targetWidth = map(theta, highestAndLowestTheta.lowest, highestAndLowestTheta.highest, 2, 12, true)
       }
     }
 
@@ -150,6 +150,7 @@ function findHighestAndLowest(numbers) {
 
 async function setup() {
   createCanvas(windowWidth, windowHeight);
+  // agentCount = windowWidth * windowHeight / 1000
 
   brainData = await processData(csvFilePath);
   const brainDataGammaVals = brainData.map((item) => {
@@ -197,13 +198,6 @@ async function setup() {
 
   highestAndLowestTheta = findHighestAndLowest(brainDataThetaVals)
 
-
-  console.log('gamma', highestAndLowestGamma)
-  console.log('beta h', highestAndLowestBetaH)
-  console.log('beta l', highestAndLowestBetaL)
-  console.log('alpha', highestAndLowestAlpha)
-  console.log('theta', highestAndLowestTheta)
-
   for (let j = 0; j < freqTypes.length; j++) {
 
     const type = freqTypes[j]
@@ -244,7 +238,6 @@ function draw() {
 
 function keyPressed() {
   if (key === ' ') {
-    // Toggle animation pause when the space key is pressed
     isPaused = !isPaused;
   }
 }
