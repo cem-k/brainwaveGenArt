@@ -45,7 +45,6 @@ function processData(csvFilePath) {
               const rowData = {};
 
               if (row["POW.AF3.Alpha"] !== '') {
-                console.log(row["POW.AF3.Alpha"] !== '')
                 columns.forEach((column) => {
                   if (column === 'Timestamp') {
                     if (firstTimestamp === null) {

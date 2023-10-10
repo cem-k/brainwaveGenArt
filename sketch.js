@@ -76,15 +76,15 @@ class Agent {
 
     if(step % 50 == 0){
       if (this.freqType === 'gamma') {
-        this.targetWidth = gamma / 5
+        this.targetWidth =  map(gamma, highestAndLowestGamma.lowest, highestAndLowestGamma.highest, 2, 12, true)
       } else if (this.freqType === 'betaH') {
-        this.targetWidth = betaH / 5
+        this.targetWidth = map(gamma, highestAndLowestBetaH.lowest, highestAndLowestBetaL.highest, 2, 12, true)
       } else if (this.freqType === 'betaL') {
-        this.targetWidth = betaL / 5
+        this.targetWidth = map(gamma, highestAndLowestBetaL.lowest, highestAndLowestBetaL.highest, 2, 12, true)
       } else if (this.freqType === 'alpha') {
-        this.targetWidth = alpha / 5
+        this.targetWidth = map(gamma, highestAndLowestAlpha.lowest, highestAndLowestAlpha.highest, 2, 12, true)
       } else if (this.freqType === 'theta') {
-        this.targetWidth = theta / 50
+        this.targetWidth = map(gamma, highestAndLowestTheta.lowest, highestAndLowestTheta.highest, 2, 12, true)
       }
     }
 
@@ -106,6 +106,7 @@ class Agent {
 
 let agents = [];
 let agentCount = 1000;
+let isPaused = false;
 let overlayAlpha = 10;
 let agentAlpha = 90;
 let colors = {
@@ -121,9 +122,8 @@ let brainData = [];
 
 let alpha, betaL, betaH, gamma, theta;
 let freqTypes = ['gamma', 'betaL', 'betaH', 'alpha', 'theta']
-let freqTypesTest = ['betaL', 'alpha', 'theta']
 let currentIndex = 0;
-let gammaValsArr = []
+let highestAndLowestGamma, highestAndLowestBetaH, highestAndLowestBetaL, highestAndLowestAlpha, highestAndLowestTheta;
 
 function findHighestAndLowest(numbers) {
   if (!Array.isArray(numbers) || numbers.length === 0) {
@@ -158,7 +158,7 @@ async function setup() {
     )
   }).flat()
 
-  const highestAndLowestGamma = findHighestAndLowest(brainDataGammaVals)
+  highestAndLowestGamma = findHighestAndLowest(brainDataGammaVals)
 
   const brainDataBetaHVals = brainData.map((item) => {
     return (
@@ -166,7 +166,7 @@ async function setup() {
     )
   }).flat()
 
-  const highestAndLowestBetaH = findHighestAndLowest(brainDataBetaHVals)
+  highestAndLowestBetaH = findHighestAndLowest(brainDataBetaHVals)
 
 
   const brainDataBetaLVals = brainData.map((item) => {
@@ -175,7 +175,7 @@ async function setup() {
     )
   }).flat()
 
-  const highestAndLowestBetaL = findHighestAndLowest(brainDataBetaLVals)
+  highestAndLowestBetaL = findHighestAndLowest(brainDataBetaLVals)
 
 
 
@@ -185,7 +185,7 @@ async function setup() {
     )
   }).flat()
 
-  const highestAndLowestAlpha = findHighestAndLowest(brainDataAlphaVals)
+  highestAndLowestAlpha = findHighestAndLowest(brainDataAlphaVals)
 
 
 
@@ -195,7 +195,7 @@ async function setup() {
     )
   }).flat()
 
-  const highestAndLowestTheta = findHighestAndLowest(brainDataThetaVals)
+  highestAndLowestTheta = findHighestAndLowest(brainDataThetaVals)
 
 
   console.log('gamma', highestAndLowestGamma)
@@ -215,27 +215,36 @@ async function setup() {
 
 let step = 0
 function draw() {
-  step++;
+  if(!isPaused){
+    step++;
 
-  fill(0, overlayAlpha);
-  noStroke();
-  rect(0, 0, width, height);
-
-  if (currentIndex < brainData.length) {
-    alpha = brainData[currentIndex].alpha;
-    betaL = brainData[currentIndex].betaL;
-    betaH = brainData[currentIndex].betaH;
-    gamma = brainData[currentIndex].gamma;
-    theta = brainData[currentIndex].theta;
-    currentIndex++;
-  } else {
-    currentIndex = 0;
-  }
-
-  stroke(0, agentAlpha);
-  for (var i = 0; i < agentCount; i++) {
-    if (agents[i]) {
-      agents[i].update();
+    fill(0, overlayAlpha);
+    noStroke();
+    rect(0, 0, width, height);
+  
+    if (currentIndex < brainData.length) {
+      alpha = brainData[currentIndex].alpha;
+      betaL = brainData[currentIndex].betaL;
+      betaH = brainData[currentIndex].betaH;
+      gamma = brainData[currentIndex].gamma;
+      theta = brainData[currentIndex].theta;
+      currentIndex++;
+    } else {
+      currentIndex = 0;
     }
+
+    stroke(0, agentAlpha);
+    for (var i = 0; i < agentCount; i++) {
+      if (agents[i]) {
+        agents[i].update();
+      }
+    }
+  }
+}
+
+function keyPressed() {
+  if (key === ' ') {
+    // Toggle animation pause when the space key is pressed
+    isPaused = !isPaused;
   }
 }
