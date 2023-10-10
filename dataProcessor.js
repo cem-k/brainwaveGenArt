@@ -65,8 +65,6 @@ function processData(csvFilePath) {
               return Object.keys(row).length !== 0
             })
 
-            console.log('filtered', filteredData)
-
 
             //average
             function accumulateRow(row, freqType) {
@@ -74,7 +72,6 @@ function processData(csvFilePath) {
               const rowAsArray = Object.entries(row)
               rowAsArray.forEach(item => {
                 if (item[0].includes(freqType) && item[1]) {
-                  console.log(item)
                   sum += Number(item[1])
                 }
               })

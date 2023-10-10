@@ -1,15 +1,64 @@
 class Agent {
-  constructor(noiseZRange) {
+  constructor(freqName) {
     this.vector = createVector(random(width), random(height));
     this.vectorOld = this.vector.copy();
-    this.stepSize = random(1, 5);
+
+    this.freqType = freqName
+    this.noiseScale;
+    this.noiseStrength;
+    this.noiseZVelocity;
+    this.strokeWidth;
+    this.stepSize;
     this.angle;
-    this.noiseZ = random(noiseZRange);
-    this.agentColor = color(random(0, 100), random(100, 200), random(200, 255));
+    this.noiseZ;
+    this.agentColor;
+    this.speedFactor = 0.25;
+
+    if(freqName == "gamma"){
+      this.noiseScale = 1000;
+      this.noiseStrength = 5;
+      this.noiseZ = random(0.1);
+      this.strokeWidth = 8;
+      this.agentColor = color(colors.gamma)
+      this.stepSize = 25*this.speedFactor;
+      this.noiseZVelocity = 0.01;
+    } else if(freqName == "betaH"){
+      this.noiseScale = 1000;
+      this.noiseStrength = 6;
+      this.noiseZ = random(0.4);
+      this.strokeWidth = 3;
+      this.agentColor = color(colors.betaH)
+      this.stepSize = 17*this.speedFactor;
+      this.noiseZVelocity = 0.01;
+    } else if(freqName == "betaL"){
+      this.noiseScale = 1000;
+      this.noiseStrength = 20;
+      this.noiseZ = random(0.4);
+      this.strokeWidth = 3;
+      this.agentColor = color(colors.betaL)
+      this.stepSize = 10*this.speedFactor;
+      this.noiseZVelocity = 0.02;
+    } else if(freqName == "alpha"){
+      this.noiseScale = 1000;
+      this.noiseStrength = 35;
+      this.noiseZ = random(0.4);
+      this.strokeWidth = 3;
+      this.agentColor = color(colors.alpha)
+      this.stepSize = 10*this.speedFactor;
+      this.noiseZVelocity = 0.03;
+    } else if(freqName == "theta"){
+      this.noiseScale = 1000;
+      this.noiseStrength = 40;
+      this.noiseZ = random(0.4);
+      this.strokeWidth = 3;
+      this.agentColor = color(colors.theta)
+      this.stepSize = 3*this.speedFactor;
+      this.noiseZVelocity = 0.04;
+    }
   }
 
-  update(strokeWidth, noiseScale, noiseStrength, noiseZVelocity, newColor) {
-    this.angle = noise(this.vector.x / noiseScale, this.vector.y / noiseScale, this.noiseZ) * noiseStrength;
+  update() {
+    this.angle = noise(this.vector.x / this.noiseScale, this.vector.y / this.noiseScale, this.noiseZ) * this.noiseStrength;
 
     this.vector.x += cos(this.angle) * this.stepSize;
     this.vector.y += sin(this.angle) * this.stepSize;
@@ -18,33 +67,49 @@ class Agent {
     if (this.vector.x > width + 10) this.vector.x = this.vectorOld.x = -10;
     if (this.vector.y < -10) this.vector.y = this.vectorOld.y = height + 10;
     if (this.vector.y > height + 10) this.vector.y = this.vectorOld.y = -10;
-
-    strokeWeight(strokeWidth * this.stepSize);
+    
+    if (this.freqType === 'gamma'){
+      if(gamma > 10){
+        gamma = 10
+      }
+      this.strokeWidth = lerp(this.strokeWidth, gamma/5)
+    } else if (this.freqType === 'betaH'){
+      this.strokeWidth = betaH/5
+    } else if (this.freqType === 'betaL'){
+      this.strokeWidth = betaL/5
+    } else if (this.freqType === 'alpha'){
+      this.strokeWidth = alpha/5
+    } else if (this.freqType === 'theta'){
+      this.strokeWidth = theta/50
+    } 
+    strokeWeight(this.strokeWidth);
     stroke(this.agentColor)
     line(this.vectorOld.x, this.vectorOld.y, this.vector.x, this.vector.y);
 
-    this.agentColor = lerpColor(this.agentColor, newColor, 0.1);
-
     this.vectorOld = this.vector.copy();
 
-    this.noiseZ += noiseZVelocity;
+    this.noiseZ += this.noiseZVelocity;
   }
 }
 
 let agents = [];
 let agentCount = 1000;
-let noiseScale = 1000;
-let noiseStrength = 10;
-let noiseZRange = 0.4;
-let noiseZVelocity = 0.01;
 let overlayAlpha = 10;
 let agentAlpha = 90;
-let strokeWidth = 0.4;
+let colors = {
+  gamma: 'rgb(0, 149, 255)',
+  betaH: 'rgb(19, 250, 2)',
+  betaL: 'rgb(255, 247, 0)',
+  alpha: 'rgb(255, 132, 0)',
+  theta: 'rgb(255, 4, 0)'
+}
 
 let csvFilePath = './Eeg_data/Eeg_Test_data.csv';
 let brainData = [];
 
 let alpha, betaL, betaH, gamma, theta;
+let freqTypes = ['gamma', 'betaL', 'betaH', 'alpha', 'theta']
+let freqTypesTest = ['betaL', 'alpha', 'theta']
 let currentIndex = 0;
 
 async function setup() {
@@ -53,9 +118,19 @@ async function setup() {
   brainData = await processData(csvFilePath);
   console.log(brainData)
 
-  for (var i = 0; i < agentCount; i++) {
-    agents[i] = new Agent(noiseZRange);
+  for (let j = 0; j < freqTypes.length; j++){
+    console.log(freqTypes[j] === "gamma")
+    const type = freqTypes[j]
+    for (let i = 0; i < agentCount / 5; i++){
+      agents.push(new Agent(type));
+    }
   }
+
+
+  // for (var i = 0; i < agentCount; i++) {
+  //   if (i <= agentCount / 5) {
+  //     agents[i] = new Agent("alpha");
+  console.log("agent", agents)
 }
 
 let step = 0
@@ -87,19 +162,8 @@ function draw() {
 
   stroke(0, agentAlpha);
   for (var i = 0; i < agentCount; i++) {
-    if (i <= agentCount / 5) {
-      //blue
-      agents[i].update(strokeWidth, noiseScale, noiseStrength, noiseZVelocity, color(random(0, 100), random(100, 200), random(200, 255)));
-    } else if (i <= 400) {
-      agents[i].update(strokeWidth, noiseScale, noiseStrength * 10, noiseZVelocity, color(random(0, 100), random(200, 255), random(0, 100)));
-    } else if (i <= 600) {
-      agents[i].update(strokeWidth, noiseScale, noiseStrength * 5, noiseZVelocity, color(random(200, 255), random(0, 100), random(0, 100)));
-    } else if (i <= 800) {
-      //yellow
-      agents[i].update(strokeWidth, noiseScale, noiseStrength * 10, noiseZVelocity, color(random(0, 100), random(100, 200), random(200, 255)));
-    } else if (i <= 1000) {
-      //orange
-      agents[i].update(strokeWidth, noiseScale, noiseStrength * 10, noiseZVelocity, color(random(200, 255), random(100, 200), random(0, 100)));
+    if(agents[i]){
+      agents[i].update();
     }
   }
 }
