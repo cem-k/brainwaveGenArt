@@ -142,29 +142,26 @@ async function setup() {
   createCanvas(windowWidth, windowHeight);
 
   brainData = await processData(csvFilePath);
-  const gammaVals = brainData.map((item) => {
+  const brainDataVals = brainData.map((item) => {
     return (
-      { gamma: Number(item.gamma) }
+      [Number(item.gamma), Number(item.betaH), Number(item.betaL), Number(item.alpha), Number(item.theta)]
     )
-  }).forEach((value) => {
-    console.log('gama', value.gamma)
-    gammaValsArr.push(value.gamma)
-  })
-  console.log('gamma', findHighestAndLowest(gammaValsArr))
+  }).flat()
 
-  for (let j = 0; j < freqTypes.length; j++) {
-    console.log(freqTypes[j] === "gamma")
-    const type = freqTypes[j]
-    for (let i = 0; i < agentCount / 5; i++) {
-      agents.push(new Agent(type));
-    }
-  }
+  const highestAndLowest = findHighestAndLowest(brainDataVals)
+  console.log(highestAndLowest)
 
+  // for (let j = 0; j < freqTypes.length; j++) {
+
+  //   const type = freqTypes[j]
+  //   for (let i = 0; i < agentCount / 5; i++) {
+  //     agents.push(new Agent(type));
+  //   }
+  // }
 
   // for (var i = 0; i < agentCount; i++) {
   //   if (i <= agentCount / 5) {
   //     agents[i] = new Agent("alpha");
-  console.log("agent", agents)
 }
 
 let step = 0
