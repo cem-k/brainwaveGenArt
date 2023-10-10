@@ -142,22 +142,65 @@ async function setup() {
   createCanvas(windowWidth, windowHeight);
 
   brainData = await processData(csvFilePath);
-  const brainDataVals = brainData.map((item) => {
+  const brainDataGammaVals = brainData.map((item) => {
     return (
-      [Number(item.gamma), Number(item.betaH), Number(item.betaL), Number(item.alpha), Number(item.theta)]
+      [Number(item.gamma)]
     )
   }).flat()
 
-  const highestAndLowest = findHighestAndLowest(brainDataVals)
-  console.log(highestAndLowest)
+  const highestAndLowestGamma = findHighestAndLowest(brainDataGammaVals)
 
-  // for (let j = 0; j < freqTypes.length; j++) {
+  const brainDataBetaHVals = brainData.map((item) => {
+    return (
+      [Number(item.betaH)]
+    )
+  }).flat()
 
-  //   const type = freqTypes[j]
-  //   for (let i = 0; i < agentCount / 5; i++) {
-  //     agents.push(new Agent(type));
-  //   }
-  // }
+  const highestAndLowestBetaH = findHighestAndLowest(brainDataBetaHVals)
+
+
+  const brainDataBetaLVals = brainData.map((item) => {
+    return (
+      [Number(item.betaL)]
+    )
+  }).flat()
+
+  const highestAndLowestBetaL = findHighestAndLowest(brainDataBetaLVals)
+
+
+
+  const brainDataAlphaVals = brainData.map((item) => {
+    return (
+      [Number(item.alpha)]
+    )
+  }).flat()
+
+  const highestAndLowestAlpha = findHighestAndLowest(brainDataAlphaVals)
+
+
+
+  const brainDataThetaVals = brainData.map((item) => {
+    return (
+      [Number(item.theta)]
+    )
+  }).flat()
+
+  const highestAndLowestTheta = findHighestAndLowest(brainDataThetaVals)
+
+
+  console.log('gamma', highestAndLowestGamma)
+  console.log('beta h', highestAndLowestBetaH)
+  console.log('beta l', highestAndLowestBetaL)
+  console.log('alpha', highestAndLowestAlpha)
+  console.log('theta', highestAndLowestTheta)
+
+  for (let j = 0; j < freqTypes.length; j++) {
+
+    const type = freqTypes[j]
+    for (let i = 0; i < agentCount / 5; i++) {
+      agents.push(new Agent(type));
+    }
+  }
 
   // for (var i = 0; i < agentCount; i++) {
   //   if (i <= agentCount / 5) {
