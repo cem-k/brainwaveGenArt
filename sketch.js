@@ -14,45 +14,45 @@ class Agent {
     this.agentColor;
     this.speedFactor = 0.25;
 
-    if(freqName == "gamma"){
+    if (freqName == "gamma") {
       this.noiseScale = 1000;
       this.noiseStrength = 5;
       this.noiseZ = random(0.1);
       this.strokeWidth = 8;
       this.agentColor = color(colors.gamma)
-      this.stepSize = 25*this.speedFactor;
+      this.stepSize = 25 * this.speedFactor;
       this.noiseZVelocity = 0.01;
-    } else if(freqName == "betaH"){
+    } else if (freqName == "betaH") {
       this.noiseScale = 1000;
       this.noiseStrength = 6;
       this.noiseZ = random(0.4);
       this.strokeWidth = 3;
       this.agentColor = color(colors.betaH)
-      this.stepSize = 17*this.speedFactor;
+      this.stepSize = 17 * this.speedFactor;
       this.noiseZVelocity = 0.01;
-    } else if(freqName == "betaL"){
+    } else if (freqName == "betaL") {
       this.noiseScale = 1000;
       this.noiseStrength = 20;
       this.noiseZ = random(0.4);
       this.strokeWidth = 3;
       this.agentColor = color(colors.betaL)
-      this.stepSize = 10*this.speedFactor;
+      this.stepSize = 10 * this.speedFactor;
       this.noiseZVelocity = 0.02;
-    } else if(freqName == "alpha"){
+    } else if (freqName == "alpha") {
       this.noiseScale = 1000;
       this.noiseStrength = 35;
       this.noiseZ = random(0.4);
       this.strokeWidth = 3;
       this.agentColor = color(colors.alpha)
-      this.stepSize = 10*this.speedFactor;
+      this.stepSize = 10 * this.speedFactor;
       this.noiseZVelocity = 0.03;
-    } else if(freqName == "theta"){
+    } else if (freqName == "theta") {
       this.noiseScale = 1000;
       this.noiseStrength = 40;
       this.noiseZ = random(0.4);
       this.strokeWidth = 3;
       this.agentColor = color(colors.theta)
-      this.stepSize = 3*this.speedFactor;
+      this.stepSize = 3 * this.speedFactor;
       this.noiseZVelocity = 0.04;
     }
   }
@@ -67,21 +67,21 @@ class Agent {
     if (this.vector.x > width + 10) this.vector.x = this.vectorOld.x = -10;
     if (this.vector.y < -10) this.vector.y = this.vectorOld.y = height + 10;
     if (this.vector.y > height + 10) this.vector.y = this.vectorOld.y = -10;
-    
-    if (this.freqType === 'gamma'){
-      if(gamma > 10){
+
+    if (this.freqType === 'gamma') {
+      if (gamma > 10) {
         gamma = 10
       }
-      this.strokeWidth = lerp(this.strokeWidth, gamma/5)
-    } else if (this.freqType === 'betaH'){
-      this.strokeWidth = betaH/5
-    } else if (this.freqType === 'betaL'){
-      this.strokeWidth = betaL/5
-    } else if (this.freqType === 'alpha'){
-      this.strokeWidth = alpha/5
-    } else if (this.freqType === 'theta'){
-      this.strokeWidth = theta/50
-    } 
+      this.strokeWidth = lerp(this.strokeWidth, gamma / 5)
+    } else if (this.freqType === 'betaH') {
+      this.strokeWidth = betaH / 5
+    } else if (this.freqType === 'betaL') {
+      this.strokeWidth = betaL / 5
+    } else if (this.freqType === 'alpha') {
+      this.strokeWidth = alpha / 5
+    } else if (this.freqType === 'theta') {
+      this.strokeWidth = theta / 50
+    }
     strokeWeight(this.strokeWidth);
     stroke(this.agentColor)
     line(this.vectorOld.x, this.vectorOld.y, this.vector.x, this.vector.y);
@@ -111,17 +111,51 @@ let alpha, betaL, betaH, gamma, theta;
 let freqTypes = ['gamma', 'betaL', 'betaH', 'alpha', 'theta']
 let freqTypesTest = ['betaL', 'alpha', 'theta']
 let currentIndex = 0;
+let gammaValsArr = []
+
+function findHighestAndLowest(numbers) {
+  if (!Array.isArray(numbers) || numbers.length === 0) {
+    return "Please provide a valid non-empty array.";
+  }
+
+  let highest = numbers[0];
+  let lowest = numbers[0];
+
+  for (let i = 1; i < numbers.length; i++) {
+    if (numbers[i] > highest) {
+      highest = numbers[i];
+    }
+    if (numbers[i] < lowest && numbers[i] !== 0) {
+      lowest = numbers[i];
+    }
+  }
+
+  return {
+    highest: highest,
+    lowest: lowest
+  };
+}
+
+
 
 async function setup() {
   createCanvas(windowWidth, windowHeight);
 
   brainData = await processData(csvFilePath);
-  console.log(brainData)
+  const gammaVals = brainData.map((item) => {
+    return (
+      { gamma: Number(item.gamma) }
+    )
+  }).forEach((value) => {
+    console.log('gama', value.gamma)
+    gammaValsArr.push(value.gamma)
+  })
+  console.log('gamma', findHighestAndLowest(gammaValsArr))
 
-  for (let j = 0; j < freqTypes.length; j++){
+  for (let j = 0; j < freqTypes.length; j++) {
     console.log(freqTypes[j] === "gamma")
     const type = freqTypes[j]
-    for (let i = 0; i < agentCount / 5; i++){
+    for (let i = 0; i < agentCount / 5; i++) {
       agents.push(new Agent(type));
     }
   }
@@ -162,7 +196,7 @@ function draw() {
 
   stroke(0, agentAlpha);
   for (var i = 0; i < agentCount; i++) {
-    if(agents[i]){
+    if (agents[i]) {
       agents[i].update();
     }
   }

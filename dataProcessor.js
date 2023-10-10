@@ -84,6 +84,7 @@ function processData(csvFilePath) {
                 { timestamp: row.Timestamp, alpha: accumulateRow(row, 'Alpha'), betaL: accumulateRow(row, 'BetaL'), betaH: accumulateRow(row, 'BetaH'), gamma: accumulateRow(row, 'Gamma'), theta: accumulateRow(row, 'Theta') }
               )
             })
+
             resolve(accValueData)
           },
         });
