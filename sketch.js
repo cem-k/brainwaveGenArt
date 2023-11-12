@@ -104,6 +104,61 @@ class Agent {
   }
 }
 
+class Bar {
+  constructor(freqName) {
+    this.height = 1;
+    this.targeHeight = 1;
+    this.freqType = freqName
+    if(freqName === "gamma"){
+      this.vector = createVector(width*0.95-25, height/5-50)
+      this.color = colors.gamma
+    } else if (freqName == "betaH") {
+      this.vector = createVector(width*0.95-25, height/5*2-50)
+      this.color = colors.betaH
+    } else if (freqName == "betaL") {
+      this.vector = createVector(width*0.95-25, height/5*3-50)
+      this.color = colors.betaL
+    } else if (freqName == "alpha") {
+      this.vector = createVector(width*0.95-25, height/5*4-50)
+      this.color = colors.alpha
+    } else if (freqName == "theta") {
+      this.vector = createVector(width*0.95-25, height/5*5-50)
+      this.color = colors.theta
+    }
+  }
+
+  update(){
+    this.height = lerp(this.height, this.targeHeight, 0.1)
+
+    fill(this.color);
+    rect(this.vector.x, this.vector.y, 50, -this.height);
+
+    fill(255);
+    textAlign(CENTER);
+    text(this.freqType, this.vector.x + 25, this.vector.y + 20);
+
+    if(step % 50 == 0){
+      if (this.freqType === 'gamma') {
+        this.targeHeight = map(gamma, highestAndLowestGamma.lowest, highestAndLowestGamma.highest, 1, 100, true);
+      } else if (this.freqType === 'betaH') {
+        this.targeHeight = map(betaH, highestAndLowestBetaH.lowest, highestAndLowestBetaH.highest, 1, 100, true);
+      } else if (this.freqType === 'betaL') {
+        this.targeHeight = map(betaL, highestAndLowestBetaL.lowest, highestAndLowestBetaL.highest, 1, 100, true);
+      } else if (this.freqType === 'alpha') {
+        this.targeHeight = map(alpha, highestAndLowestAlpha.lowest, highestAndLowestAlpha.highest, 1, 100, true);
+      } else if (this.freqType === 'theta') {
+        this.targeHeight = map(theta, highestAndLowestTheta.lowest, highestAndLowestTheta.highest, 1, 100, true);
+      }
+    }
+  }
+}
+
+function formatTime(seconds) {
+  let minutes = Math.floor(seconds / 60);
+  let remainingSeconds = Math.round(seconds % 60);
+  return nf(minutes, 2) + ':' + nf(remainingSeconds, 2);
+}
+
 let agents = [];
 let agentCount = 1000;
 let isPaused = false;
@@ -117,13 +172,19 @@ let colors = {
   theta: 'rgb(255, 4, 0)'
 }
 
-let csvFilePath = './Eeg_data/Eeg_Test_data.csv';
+let csvFilePath = './Eeg_data/Instagram.csv';
 let brainData = [];
 
 let alpha, betaL, betaH, gamma, theta;
 let freqTypes = ['gamma', 'betaL', 'betaH', 'alpha', 'theta']
 let currentIndex = 0;
 let highestAndLowestGamma, highestAndLowestBetaH, highestAndLowestBetaL, highestAndLowestAlpha, highestAndLowestTheta;
+
+let show = true;
+let bars = [];
+
+let elapsedTime = 0;
+let totalTime = 0;
 
 function findHighestAndLowest(numbers) {
   if (!Array.isArray(numbers) || numbers.length === 0) {
@@ -150,7 +211,7 @@ function findHighestAndLowest(numbers) {
 
 async function setup() {
   createCanvas(windowWidth, windowHeight);
-  // agentCount = windowWidth * windowHeight / 1000
+  agentCount = windowWidth * windowHeight / 300
 
   brainData = await processData(csvFilePath);
   const brainDataGammaVals = brainData.map((item) => {
@@ -158,6 +219,8 @@ async function setup() {
       [Number(item.gamma)]
     )
   }).flat()
+
+  totalTime = brainData[brainData.length-2].timestamp
 
   highestAndLowestGamma = findHighestAndLowest(brainDataGammaVals)
 
@@ -204,6 +267,7 @@ async function setup() {
     for (let i = 0; i < agentCount / 5; i++) {
       agents.push(new Agent(type));
     }
+    bars.push(new Bar(type))
   }
 }
 
@@ -211,6 +275,12 @@ let step = 0
 function draw() {
   if(!isPaused){
     step++;
+    if(step % 60 === 0){
+      elapsedTime++;
+    }
+    if (elapsedTime >= totalTime) {
+      elapsedTime = 0;
+    }
 
     fill(0, overlayAlpha);
     noStroke();
@@ -233,11 +303,33 @@ function draw() {
         agents[i].update();
       }
     }
+
+    if(show){
+      fill(0)
+      noStroke()
+      rect(width*0.9, 0, width*0.2, windowHeight)
+      
+      for(let i = 0; i < bars.length; i++){
+        if(bars[i]){
+          bars[i].update();
+        }
+      }
+
+      let timerText = `${formatTime(elapsedTime)}/${formatTime(totalTime)}`;
+      fill(255);
+      noStroke();
+      textAlign(CENTER);
+      textSize(16);
+      text(timerText, width*0.95, 20);
+    }
   }
 }
 
 function keyPressed() {
   if (key === ' ') {
     isPaused = !isPaused;
+  }
+  if (key === 'b') {
+    show = !show;
   }
 }
