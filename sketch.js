@@ -74,9 +74,9 @@ class Agent {
     if (this.vector.y < -10) this.vector.y = this.vectorOld.y = height + 10;
     if (this.vector.y > height + 10) this.vector.y = this.vectorOld.y = -10;
 
-    if(step % 50 == 0){
+    if (step % 50 == 0) {
       if (this.freqType === 'gamma') {
-        this.targetWidth =  map(gamma, highestAndLowestGamma.lowest, highestAndLowestGamma.highest, 2, 12, true)
+        this.targetWidth = map(gamma, highestAndLowestGamma.lowest, highestAndLowestGamma.highest, 2, 12, true)
       } else if (this.freqType === 'betaH') {
         this.targetWidth = map(betaH, highestAndLowestBetaH.lowest, highestAndLowestBetaL.highest, 2, 12, true)
       } else if (this.freqType === 'betaL') {
@@ -88,7 +88,7 @@ class Agent {
       }
     }
 
-    if(this.targetWidth >= this.strokeWidth) {
+    if (this.targetWidth >= this.strokeWidth) {
       this.strokeWidth = lerp(this.strokeWidth, this.targetWidth, 0.5)
     } else {
       this.strokeWidth = lerp(this.targetWidth, this.strokeWidth, 0.5)
@@ -109,25 +109,25 @@ class Bar {
     this.height = 1;
     this.targeHeight = 1;
     this.freqType = freqName
-    if(freqName === "gamma"){
-      this.vector = createVector(width*0.95-25, height/5-50)
+    if (freqName === "gamma") {
+      this.vector = createVector(width * 0.95 - 25, height / 5 - 50)
       this.color = colors.gamma
     } else if (freqName == "betaH") {
-      this.vector = createVector(width*0.95-25, height/5*2-50)
+      this.vector = createVector(width * 0.95 - 25, height / 5 * 2 - 50)
       this.color = colors.betaH
     } else if (freqName == "betaL") {
-      this.vector = createVector(width*0.95-25, height/5*3-50)
+      this.vector = createVector(width * 0.95 - 25, height / 5 * 3 - 50)
       this.color = colors.betaL
     } else if (freqName == "alpha") {
-      this.vector = createVector(width*0.95-25, height/5*4-50)
+      this.vector = createVector(width * 0.95 - 25, height / 5 * 4 - 50)
       this.color = colors.alpha
     } else if (freqName == "theta") {
-      this.vector = createVector(width*0.95-25, height/5*5-50)
+      this.vector = createVector(width * 0.95 - 25, height / 5 * 5 - 50)
       this.color = colors.theta
     }
   }
 
-  update(){
+  update() {
     this.height = lerp(this.height, this.targeHeight, 0.1)
 
     fill(this.color);
@@ -137,7 +137,7 @@ class Bar {
     textAlign(CENTER);
     text(this.freqType, this.vector.x + 25, this.vector.y + 20);
 
-    if(step % 50 == 0){
+    if (step % 50 == 0) {
       if (this.freqType === 'gamma') {
         this.targeHeight = map(gamma, highestAndLowestGamma.lowest, highestAndLowestGamma.highest, 1, 100, true);
       } else if (this.freqType === 'betaH') {
@@ -171,6 +171,15 @@ let colors = {
   alpha: 'rgb(255, 132, 0)',
   theta: 'rgb(255, 4, 0)'
 }
+
+
+let csvFilePaths = [
+  './Eeg_data/Instagram.csv',
+  './Eeg_data/Chess_One.csv',
+  './Eeg_data/Alarm_Sound.csv',
+  './Eeg_data/Relaxing_Music.csv'
+]
+
 
 let csvFilePath = './Eeg_data/Instagram.csv';
 let brainData = [];
@@ -211,8 +220,27 @@ function findHighestAndLowest(numbers) {
 
 async function setup() {
   createCanvas(windowWidth, windowHeight);
-  agentCount = windowWidth * windowHeight / 300
+  const buttonInstagram = createButton('instagram')
+  buttonInstagram.position(100, 0)
+  buttonInstagram.mousePressed(() => switchDataset(0))
 
+
+  const buttonChess = createButton('chess')
+  buttonChess.position(200, 0)
+  buttonChess.mousePressed(() => switchDataset(1))
+
+  const buttonAlarm = createButton('alarm')
+  buttonAlarm.position(300, 0)
+  buttonAlarm.mousePressed(() => switchDataset(2))
+
+
+  const buttonMusic = createButton('music')
+  buttonMusic.position(400, 0)
+  buttonMusic.mousePressed(() => switchDataset(3))
+
+
+
+  agentCount = windowWidth * windowHeight / 300
   brainData = await processData(csvFilePath);
   const brainDataGammaVals = brainData.map((item) => {
     return (
@@ -220,7 +248,7 @@ async function setup() {
     )
   }).flat()
 
-  totalTime = brainData[brainData.length-2].timestamp
+  totalTime = brainData[brainData.length - 2].timestamp
 
   highestAndLowestGamma = findHighestAndLowest(brainDataGammaVals)
 
@@ -273,9 +301,9 @@ async function setup() {
 
 let step = 0
 function draw() {
-  if(!isPaused){
+  if (!isPaused) {
     step++;
-    if(step % 60 === 0){
+    if (step % 60 === 0) {
       elapsedTime++;
     }
     if (elapsedTime >= totalTime) {
@@ -285,7 +313,7 @@ function draw() {
     fill(0, overlayAlpha);
     noStroke();
     rect(0, 0, width, height);
-  
+
     if (currentIndex < brainData.length) {
       alpha = brainData[currentIndex].alpha;
       betaL = brainData[currentIndex].betaL;
@@ -304,13 +332,13 @@ function draw() {
       }
     }
 
-    if(show){
+    if (show) {
       fill(0)
       noStroke()
-      rect(width*0.9, 0, width*0.2, windowHeight)
-      
-      for(let i = 0; i < bars.length; i++){
-        if(bars[i]){
+      rect(width * 0.9, 0, width * 0.2, windowHeight)
+
+      for (let i = 0; i < bars.length; i++) {
+        if (bars[i]) {
           bars[i].update();
         }
       }
@@ -320,7 +348,7 @@ function draw() {
       noStroke();
       textAlign(CENTER);
       textSize(16);
-      text(timerText, width*0.95, 20);
+      text(timerText, width * 0.95, 20);
     }
   }
 }
@@ -332,4 +360,22 @@ function keyPressed() {
   if (key === 'b') {
     show = !show;
   }
+}
+
+
+function switchDataset(index) {
+  const filePath = csvFilePaths[index]
+  csvFilePath = filePath
+  console.log('test', filePath, index)
+
+
+  agents = [];
+  bars = [];
+  step = 0;
+  isPaused = false;
+  elapsedTime = 0;
+  totalTime = 0;
+
+  // Call your existing setup code
+  setup();
 }
