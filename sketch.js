@@ -172,14 +172,12 @@ let colors = {
   theta: 'rgb(255, 4, 0)'
 }
 
-
 let csvFilePaths = [
   './Eeg_data/Instagram.csv',
   './Eeg_data/Chess_One.csv',
   './Eeg_data/Alarm_Sound.csv',
   './Eeg_data/Relaxing_Music.csv'
 ]
-
 
 let csvFilePath = './Eeg_data/Instagram.csv';
 let brainData = [];
@@ -220,35 +218,43 @@ function findHighestAndLowest(numbers) {
 
 async function setup() {
   createCanvas(windowWidth, windowHeight);
-  const buttonInstagram = createButton('instagram')
-  buttonInstagram.position(100, 0)
+  const buttonInstagram = createButton('Instagram')
+  buttonInstagram.position(0, 0)
+  buttonInstagram.style('background-color', 'black')
+  buttonInstagram.style('color', 'white')
+  buttonInstagram.size(100)
   buttonInstagram.mousePressed(() => switchDataset(0))
 
-
-  const buttonChess = createButton('chess')
-  buttonChess.position(200, 0)
+  const buttonChess = createButton('Chess')
+  buttonChess.position(100, 0)
+  buttonChess.style('background-color', 'black')
+  buttonChess.style('color', 'white')
+  buttonChess.size(100)
   buttonChess.mousePressed(() => switchDataset(1))
 
-  const buttonAlarm = createButton('alarm')
-  buttonAlarm.position(300, 0)
+  const buttonAlarm = createButton('Alarm')
+  buttonAlarm.position(200, 0)
+  buttonAlarm.style('background-color', 'black')
+  buttonAlarm.style('color', 'white')
+  buttonAlarm.size(100)
   buttonAlarm.mousePressed(() => switchDataset(2))
 
-
-  const buttonMusic = createButton('music')
-  buttonMusic.position(400, 0)
+  const buttonMusic = createButton('Music')
+  buttonMusic.position(300, 0)
+  buttonMusic.style('background-color', 'black')
+  buttonMusic.style('color', 'white')
+  buttonMusic.size(100)
   buttonMusic.mousePressed(() => switchDataset(3))
-
-
 
   agentCount = windowWidth * windowHeight / 300
   brainData = await processData(csvFilePath);
+  totalTime = brainData[brainData.length - 2].timestamp
+
   const brainDataGammaVals = brainData.map((item) => {
     return (
       [Number(item.gamma)]
     )
   }).flat()
-
-  totalTime = brainData[brainData.length - 2].timestamp
 
   highestAndLowestGamma = findHighestAndLowest(brainDataGammaVals)
 
@@ -260,7 +266,6 @@ async function setup() {
 
   highestAndLowestBetaH = findHighestAndLowest(brainDataBetaHVals)
 
-
   const brainDataBetaLVals = brainData.map((item) => {
     return (
       [Number(item.betaL)]
@@ -269,8 +274,6 @@ async function setup() {
 
   highestAndLowestBetaL = findHighestAndLowest(brainDataBetaLVals)
 
-
-
   const brainDataAlphaVals = brainData.map((item) => {
     return (
       [Number(item.alpha)]
@@ -278,8 +281,6 @@ async function setup() {
   }).flat()
 
   highestAndLowestAlpha = findHighestAndLowest(brainDataAlphaVals)
-
-
 
   const brainDataThetaVals = brainData.map((item) => {
     return (
@@ -366,8 +367,6 @@ function keyPressed() {
 function switchDataset(index) {
   const filePath = csvFilePaths[index]
   csvFilePath = filePath
-  console.log('test', filePath, index)
-
 
   agents = [];
   bars = [];
@@ -376,6 +375,5 @@ function switchDataset(index) {
   elapsedTime = 0;
   totalTime = 0;
 
-  // Call your existing setup code
   setup();
 }
